@@ -15,6 +15,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -126,24 +127,13 @@ const zdrPoints = [
   },
 ];
 
-function Wordmark({ className }: { className?: string }) {
-  return (
-    <span className={cn("flex items-center gap-3", className)}>
-      <span className="h-5 w-1.5 bg-primary shadow-[0_0_12px] shadow-primary/60" aria-hidden="true" />
-      <span className="font-heading text-sm font-semibold tracking-[0.25em] uppercase">
-        TenderLabs
-      </span>
-    </span>
-  );
-}
-
 export default function Home() {
   return (
     <div className="relative flex flex-1 flex-col overflow-x-clip">
       {/* Glass navbar */}
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3.5">
-          <Wordmark />
+          <Logo />
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             <a href="#how-it-works" className="transition-colors hover:text-foreground">
               How it works
@@ -181,7 +171,7 @@ export default function Home() {
           {/* Depth: blueprint grid + radial glow, all token-derived */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-blueprint-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
+            className="pointer-events-none absolute inset-0 bg-dot-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]"
           />
           <div
             aria-hidden="true"
@@ -257,9 +247,9 @@ export default function Home() {
               {stats.map((stat) => (
                 <div
                   key={stat.value}
-                  className="rounded-xl bg-gradient-to-b from-border to-transparent p-px"
+                  className="rounded-xl bg-gradient-to-b from-border to-transparent p-px shadow-lg shadow-foreground/5"
                 >
-                  <div className="flex h-full flex-col gap-3 rounded-[calc(var(--radius-xl)-1px)] bg-card/80 p-6 backdrop-blur-sm">
+                  <div className="flex h-full flex-col gap-3 rounded-[calc(var(--radius-xl)-1px)] bg-card p-6 dark:bg-card/80 dark:backdrop-blur-sm">
                     <stat.icon className="size-5 text-primary" />
                     <p className="font-heading text-3xl font-semibold">{stat.value}</p>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -287,7 +277,10 @@ export default function Home() {
             </div>
             <div className="grid gap-6 md:grid-cols-3">
               {steps.map((step) => (
-                <Card key={step.number} className="relative bg-card/60">
+                <Card
+                  key={step.number}
+                  className="relative bg-card shadow-lg shadow-foreground/5 dark:bg-card/60 dark:shadow-none"
+                >
                   <CardHeader>
                     <span className="mb-2 font-mono text-xs tracking-widest text-primary">
                       {step.number}
@@ -308,7 +301,7 @@ export default function Home() {
         <section id="security" className="scroll-mt-16">
           <div className="mx-auto w-full max-w-4xl px-6 pb-20">
             <div className="rounded-2xl bg-gradient-to-b from-primary/40 via-border to-transparent p-px shadow-2xl shadow-primary/10">
-              <div className="rounded-[calc(var(--radius-2xl)-1px)] bg-card/95 px-8 py-10 backdrop-blur-sm">
+              <div className="rounded-[calc(var(--radius-2xl)-1px)] bg-card px-8 py-10 dark:bg-card/95 dark:backdrop-blur-sm">
                 <div className="mb-8 flex flex-col items-center gap-4 text-center">
                   <span className="flex size-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10 shadow-[0_0_40px] shadow-primary/25">
                     <ShieldCheck className="size-7 text-primary" />
@@ -347,7 +340,7 @@ export default function Home() {
 
         {/* Pitch video placeholder */}
         <section className="mx-auto w-full max-w-4xl px-6 pb-20">
-          <div className="rounded-2xl bg-gradient-to-b from-border to-transparent p-px">
+          <div className="rounded-2xl bg-gradient-to-b from-border to-transparent p-px shadow-xl shadow-foreground/5">
             <div className="flex aspect-video flex-col items-center justify-center gap-5 rounded-[calc(var(--radius-2xl)-1px)] bg-gradient-to-b from-secondary/60 to-card">
               <button
                 type="button"
@@ -391,9 +384,9 @@ export default function Home() {
                 <Card
                   key={tier.name}
                   className={cn(
-                    "bg-card/70 backdrop-blur-sm",
+                    "bg-card shadow-lg shadow-foreground/5 dark:bg-card/70 dark:shadow-none dark:backdrop-blur-sm",
                     tier.highlighted &&
-                      "relative bg-card ring-2 ring-primary shadow-2xl shadow-primary/20 md:-my-3"
+                      "relative bg-card shadow-2xl ring-2 ring-primary shadow-primary/15 md:-my-3 dark:bg-card dark:shadow-2xl dark:shadow-primary/20"
                   )}
                 >
                   <CardHeader>
@@ -466,7 +459,11 @@ export default function Home() {
 
       <footer className="border-t border-border/60 bg-background/60">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5 text-xs text-muted-foreground">
-          <Wordmark className="opacity-80 [&>span:last-child]:text-[11px]" />
+          <Logo
+            className="opacity-90"
+            markClassName="size-4.5"
+            textClassName="text-sm"
+          />
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="size-3.5 text-primary" />
             Uploads live in memory only — never on disk.
