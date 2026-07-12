@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
 
 import { signOut } from "./actions";
+import { ConversionPanel } from "./conversion-panel";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -38,11 +39,8 @@ export default async function DashboardPage() {
           </form>
         </div>
       </header>
-      <main className="flex flex-1 flex-col items-center justify-center gap-2">
-        <h1 className="font-heading text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Signed in. Conversion tools arrive in a later milestone.
-        </p>
+      <main className="flex flex-1 flex-col items-center justify-center py-8">
+        <ConversionPanel />
       </main>
     </div>
   );
