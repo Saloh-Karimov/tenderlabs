@@ -15,6 +15,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -169,6 +170,7 @@ export default function Home() {
             >
               Get started
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
