@@ -130,3 +130,17 @@
     @apply font-sans;
   }
 }
+
+@utility bg-blueprint-grid {
+  background-image: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--border) 55%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--border) 55%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 44px 44px;
+}
