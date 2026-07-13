@@ -106,7 +106,7 @@ async def convert_endpoint(
         raise HTTPException(status_code=500, detail="Conversion failed")
 
     duration_ms = round((time.monotonic() - started) * 1000)
-    download_name = f"{sanitise(tender_name)} - CAVSOFT IMPORT.zip"
+    download_name = f"{sanitise(tender_name)} - CavSoft Import.zip"
 
     def log_metadata():
         log.info(

@@ -130,7 +130,7 @@ def test_master_summary_totals():
     ws = rows_of(load_sheet(zf, "Tower A - SUMMARY.xlsx", "Summary"))
 
     assert ws[0][0] == "Project: Tower A"
-    assert ws[3] == ["System", "Level", "Raw", "Cavsoft", "Match?"]
+    assert ws[3] == ["System", "Level", "Raw", "CavSoft", "Match?"]
     assert ws[4][0] == "CHW"
     assert ws[5][:5] == ["CHW", "LEVEL 1", 37.0, 35.0, "*** NO ***"]
     assert ws[6][:5] == ["CHW", "LEVEL 2", 12.0, 12.0, "YES"]

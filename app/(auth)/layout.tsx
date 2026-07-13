@@ -13,7 +13,7 @@ export default function AuthLayout({
           </span>
         </div>
         <p className="text-xs tracking-widest text-muted-foreground uppercase">
-          Bluebeam → CAVsoft conversion
+          Bluebeam → CavSoft conversion
         </p>
       </div>
       {children}

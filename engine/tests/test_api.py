@@ -44,7 +44,7 @@ def test_convert_single_file_happy_path(as_user):
     )
     assert res.status_code == 200
     assert res.headers["content-type"] == "application/zip"
-    assert 'filename="Tower A - CAVSOFT IMPORT.zip"' in res.headers["content-disposition"]
+    assert 'filename="Tower A - CavSoft Import.zip"' in res.headers["content-disposition"]
 
     zf = zipfile.ZipFile(io.BytesIO(res.content))
     assert "Tower A - SUMMARY.xlsx" in zf.namelist()

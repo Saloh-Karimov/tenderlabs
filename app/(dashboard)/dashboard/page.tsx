@@ -126,7 +126,7 @@ export default async function DashboardPage() {
             Command Center
           </h1>
           <p className="text-sm font-medium text-slate-500">
-            Bluebeam → CAVsoft conversions, processed entirely in memory.
+            Bluebeam → CavSoft conversions, processed entirely in memory.
           </p>
         </div>
 

@@ -2,7 +2,7 @@
 TenderLabs conversion core.
 
 Pure, in-memory port of the Ghost Architect data engine (v2.1):
-Bluebeam Revu CSV bytes in -> CAVsoft-import XLSX ZIP bytes out.
+Bluebeam Revu CSV bytes in -> CavSoft-import XLSX ZIP bytes out.
 
 ZERO DATA RETENTION: nothing in this module may touch the filesystem,
 raise messages containing cell values, or log anything at all.
@@ -158,7 +158,7 @@ def consolidate_rows(level_rows, lump_sum_mode=False):
 
 def build_level_workbooks(rows, system_name, tender_name, lump_sum_mode=False):
     """Group rows by level (or a single LUMP SUM node) and build one
-    CAVsoft-import workbook per level, entirely in memory.
+    CavSoft-import workbook per level, entirely in memory.
 
     Returns (results, skipped_count) where each result carries the level
     name, the in-zip filename, xlsx bytes, and verification totals.
@@ -205,7 +205,7 @@ def build_level_workbooks(rows, system_name, tender_name, lump_sum_mode=False):
         vws = wb.create_sheet("Verification")
         vws["A1"] = "Raw Bluebeam Total (All)"
         vws["B1"] = raw_total
-        vws["A2"] = "Cavsoft Billed Total"
+        vws["A2"] = "CavSoft Billed Total"
         vws["B2"] = cav_total
 
         match = round(raw_total, 2) == round(cav_total, 2)
@@ -253,7 +253,7 @@ def build_master_summary(tender_name, system_results) -> bytes:
         c.font = FONT_BOLD
         c.fill = FILL_GRAND
 
-    headers = ["System", "Level", "Raw", "Cavsoft", "Match?"]
+    headers = ["System", "Level", "Raw", "CavSoft", "Match?"]
     for c_idx, val in enumerate(headers, 1):
         c = mws.cell(row=4, column=c_idx, value=val)
         c.font = FONT_BOLD
@@ -309,7 +309,7 @@ def build_master_summary(tender_name, system_results) -> bytes:
 def convert(files: list[tuple[str, bytes]], tender_name: str,
             lump_mode: bool) -> ConversionResult:
     """Batch pipeline: a list of (source filename, CSV bytes) exports ->
-    one ZIP of CAVsoft imports plus a single unified master summary.
+    one ZIP of CavSoft imports plus a single unified master summary.
 
     Mirrors the prototype's export_paths loop: the system is detected per
     file from its filename. Files that map to the same system are merged

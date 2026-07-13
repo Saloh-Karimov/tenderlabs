@@ -165,7 +165,7 @@ export function ConversionPanel() {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${parsed.data.tenderName} - CAVSOFT IMPORT.zip`;
+      anchor.download = `${parsed.data.tenderName} - CavSoft Import.zip`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
@@ -191,7 +191,7 @@ export function ConversionPanel() {
           New conversion
         </CardTitle>
         <CardDescription className="text-slate-500">
-          Drop a Bluebeam Revu CSV export and choose how CAVsoft should receive
+          Drop a Bluebeam Revu CSV export and choose how CavSoft should receive
           it. Files are processed in memory only — nothing is stored.
         </CardDescription>
       </CardHeader>
@@ -354,7 +354,7 @@ export function ConversionPanel() {
           ) : (
             <FileUp data-icon="inline-start" />
           )}
-          {busy ? "Converting…" : "Convert & Export for CAVsoft"}
+          {busy ? "Converting…" : "Convert & Export for CavSoft"}
         </Button>
       </CardContent>
     </Card>

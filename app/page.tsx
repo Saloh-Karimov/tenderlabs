@@ -33,7 +33,7 @@ const stats = [
     icon: Clock,
     value: "3–10 hrs",
     label:
-      "Lost per estimator, every single week, to Bluebeam → CAVsoft re-entry.",
+      "Lost per estimator, every single week, to Bluebeam → CavSoft re-entry.",
   },
   {
     icon: TrendingUp,
@@ -60,7 +60,7 @@ const steps = [
     number: "03",
     icon: Zap,
     title: "Import-ready in seconds",
-    body: "You're holding a CAVsoft-ready workbook per level, plus a master summary for the whole tender. Open, import, price. No retyping. No cleanup pass.",
+    body: "You're holding a CavSoft-ready workbook per level, plus a master summary for the whole tender. Open, import, price. No retyping. No cleanup pass.",
   },
 ];
 
@@ -125,7 +125,7 @@ const tiers: {
     name: "Enterprise",
     price: "$1,499",
     cadence: "/month",
-    description: "Standardise takeoff-to-CAVsoft across every office.",
+    description: "Standardise takeoff-to-CavSoft across every office.",
     roiLine: "One workflow, every branch, every estimator.",
     features: [
       "Unlimited seats",
@@ -232,13 +232,13 @@ export default function Home() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-60" />
                 <span className="relative inline-flex size-2 rounded-full bg-amber-500" />
               </span>
-              Purpose-built for Bluebeam Revu → CAVsoft estimating teams
+              Purpose-built for Bluebeam Revu → CavSoft estimating teams
             </div>
 
             <h1 className="max-w-4xl text-5xl leading-[1.05] font-semibold tracking-tighter text-balance text-slate-900 sm:text-6xl lg:text-7xl">
               Keep measuring in Bluebeam.{" "}
               <span className="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 bg-clip-text text-transparent">
-                Stop retyping into CAVsoft.
+                Stop retyping into CavSoft.
               </span>
             </h1>
 
@@ -249,8 +249,8 @@ export default function Home() {
               <span className="font-semibold text-slate-900">
                 3–10 hours a week
               </span>{" "}
-              working as data clerks between Bluebeam and CAVsoft. TenderLabs
-              turns the exports they already make into import-ready CAVsoft
+              working as data clerks between Bluebeam and CavSoft. TenderLabs
+              turns the exports they already make into import-ready CavSoft
               workbooks in seconds.
             </p>
 
@@ -376,7 +376,7 @@ export default function Home() {
                         Watch the 3-minute walkthrough
                       </p>
                       <p className="mt-1 text-sm text-slate-500">
-                        A real Bluebeam export becomes a CAVsoft import — live,
+                        A real Bluebeam export becomes a CavSoft import — live,
                         unedited
                       </p>
                     </div>
@@ -550,7 +550,7 @@ export default function Home() {
                         Includes $5,000 concierge onboarding
                       </p>
                       <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
-                        We map your CAVsoft item database, systems and templates
+                        We map your CavSoft item database, systems and templates
                         by hand, with your estimators in the room. Your first
                         live tender converts on day one — not week six.
                       </p>

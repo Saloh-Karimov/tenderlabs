@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TenderLabs",
-  description: "Convert Bluebeam Revu exports into CAVsoft-ready imports.",
+  description: "Convert Bluebeam Revu exports into CavSoft-ready imports.",
 };
 
 export default function RootLayout({
