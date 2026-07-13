@@ -19,6 +19,7 @@ from starlette.background import BackgroundTask
 from app.auth import AuthError, verify_token
 from app.config import get_settings
 from app.core.processor import ParseError, convert, sanitise
+from app.formdata import FormDataError, parse_file_parts
 
 structlog.configure(processors=[structlog.processors.TimeStamper(fmt="iso"),
                                 structlog.processors.JSONRenderer()])
@@ -78,19 +79,25 @@ async def convert_endpoint(
     request: Request,
     tender_name: str = Query(min_length=1, max_length=120),
     lump_mode: bool = Query(False),
-    filename: str = Query("", max_length=255),
 ):
     user_id = _authenticate(request)
     started = time.monotonic()
 
-    csv_bytes = await _read_body_capped(request)
-    if not csv_bytes:
+    body = await _read_body_capped(request)
+    if not body:
         raise HTTPException(status_code=422, detail="Empty request body")
 
+    # Multipart is parsed from the RAM buffer — never FastAPI UploadFile,
+    # which spools >1MB parts to disk during parsing.
     try:
-        result = await run_in_threadpool(
-            convert, csv_bytes, tender_name, lump_mode, filename
-        )
+        files = parse_file_parts(request.headers.get("Content-Type", ""), body)
+    except FormDataError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    if not files:
+        raise HTTPException(status_code=422, detail="No files in request")
+
+    try:
+        result = await run_in_threadpool(convert, files, tender_name, lump_mode)
     except ParseError as exc:
         # ParseError messages reference column headers/structure only.
         raise HTTPException(status_code=422, detail=str(exc))
@@ -107,6 +114,8 @@ async def convert_endpoint(
             user_id=user_id,
             project=sanitise(tender_name),
             mode="lump_sum" if lump_mode else "level_by_level",
+            upload_count=len(files),
+            system_count=result.system_count,
             row_count=result.row_count,
             file_count=result.file_count,
             warning_count=result.warning_count,

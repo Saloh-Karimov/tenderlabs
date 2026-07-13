@@ -61,10 +61,10 @@ def rows_of(ws):
 
 
 def test_level_by_level_golden():
-    result = convert(make_csv(SAMPLE_ROWS), "Tower A", lump_mode=False,
-                     source_filename="Tower A - CHW.csv")
+    result = convert([("Tower A - CHW.csv", make_csv(SAMPLE_ROWS))],
+                     "Tower A", lump_mode=False)
 
-    assert result.system == "CHW"
+    assert result.system_count == 1
     assert result.row_count == 8
     assert result.warning_count == 0
     assert result.file_count == 3  # two levels + summary
@@ -102,8 +102,8 @@ def test_level_by_level_golden():
 
 
 def test_lump_sum_merges_everything():
-    result = convert(make_csv(SAMPLE_ROWS), "Tower A", lump_mode=True,
-                     source_filename="Tower A - CHW.csv")
+    result = convert([("Tower A - CHW.csv", make_csv(SAMPLE_ROWS))],
+                     "Tower A", lump_mode=True)
 
     zf, names = zip_entries(result)
     assert names == [
@@ -124,8 +124,8 @@ def test_lump_sum_merges_everything():
 
 
 def test_master_summary_totals():
-    result = convert(make_csv(SAMPLE_ROWS), "Tower A", lump_mode=False,
-                     source_filename="chw export.csv")
+    result = convert([("chw export.csv", make_csv(SAMPLE_ROWS))],
+                     "Tower A", lump_mode=False)
     zf, _ = zip_entries(result)
     ws = rows_of(load_sheet(zf, "Tower A - SUMMARY.xlsx", "Summary"))
 
@@ -139,7 +139,7 @@ def test_master_summary_totals():
 
 def test_fractional_quantity_stays_float():
     rows = [["Pipe", "3.25", "m", "1", "LEVEL 1", "", "", "P1", "Pipe"]]
-    result = convert(make_csv(rows), "T", lump_mode=False, source_filename="hw.csv")
+    result = convert([("hw.csv", make_csv(rows))], "T", lump_mode=False)
     zf, _ = zip_entries(result)
     ws = rows_of(load_sheet(zf, "HW/T - LEVEL 1 - HW.xlsx", "Cavsoft_Import"))
     assert ws[1][3] == 3.25
@@ -151,14 +151,14 @@ def test_system_detection_and_default():
     assert processor.detect_system("mystery.csv") == ""
 
     rows = [["Pipe", "1", "m", "1", "LEVEL 1", "", "", "P1", "Pipe"]]
-    result = convert(make_csv(rows), "T", lump_mode=False, source_filename="mystery.csv")
-    assert result.system == processor.DEFAULT_SYSTEM
+    result = convert([("mystery.csv", make_csv(rows))], "T", lump_mode=False)
+    _, names = zip_entries(result)
+    assert f"{processor.DEFAULT_SYSTEM}/T - LEVEL 1 - {processor.DEFAULT_SYSTEM}.xlsx" in names
 
 
 def test_tender_name_is_sanitised_in_filenames():
     rows = [["Pipe", "1", "m", "1", "LEVEL 1", "", "", "P1", "Pipe"]]
-    result = convert(make_csv(rows), 'To/wer: "A"', lump_mode=False,
-                     source_filename="chw.csv")
+    result = convert([("chw.csv", make_csv(rows))], 'To/wer: "A"', lump_mode=False)
     _, names = zip_entries(result)
     assert names == [
         "CHW/To-wer- -A- - LEVEL 1 - CHW.xlsx",
@@ -171,7 +171,7 @@ def test_levels_without_identifiers_are_skipped_and_counted():
         ["Pipe", "1", "m", "1", "LEVEL 1", "", "", "P1", "Pipe"],
         ["Note", "", "", "5", "LEVEL 9", "", "", "", ""],
     ]
-    result = convert(make_csv(rows), "T", lump_mode=False, source_filename="chw.csv")
+    result = convert([("chw.csv", make_csv(rows))], "T", lump_mode=False)
     assert result.warning_count == 1
     _, names = zip_entries(result)
     assert "CHW/T - LEVEL 1 - CHW.xlsx" in names
@@ -180,18 +180,86 @@ def test_levels_without_identifiers_are_skipped_and_counted():
 
 def test_empty_and_invalid_inputs_raise_parse_errors():
     with pytest.raises(ParseError):
-        convert(make_csv([]), "T", lump_mode=False)  # header only
+        convert([("a.csv", make_csv([]))], "T", lump_mode=False)  # header only
 
     with pytest.raises(ParseError):
-        convert(b"", "T", lump_mode=False)  # nothing at all
+        convert([("a.csv", b"")], "T", lump_mode=False)  # nothing at all
+
+    with pytest.raises(ParseError):
+        convert([], "T", lump_mode=False)  # no files at all
 
     with pytest.raises(ParseError):  # rows exist, none billable
-        convert(make_csv([["Note", "", "", "5", "L1", "", "", "", ""]]),
+        convert([("a.csv", make_csv([["Note", "", "", "5", "L1", "", "", "", ""]]))],
                 "T", lump_mode=False)
 
     with pytest.raises(ParseError):  # tender name sanitises to nothing
-        convert(make_csv([["Pipe", "1", "m", "1", "L1", "", "", "P1", "Pipe"]]),
+        convert([("a.csv", make_csv([["Pipe", "1", "m", "1", "L1", "", "", "P1", "Pipe"]]))],
                 "   ", lump_mode=False)
+
+
+def test_batch_multi_system_single_zip_and_summary():
+    chw = [["Pipe", "10", "m", "1", "LEVEL 1", "", "", "C1", "CHW Pipe"]]
+    hw = [["Pipe", "4", "m", "1", "LEVEL 1", "", "", "H1", "HW Pipe"],
+          ["Pipe", "6", "m", "1", "LEVEL 2", "", "", "H1", "HW Pipe"]]
+    cw = [["Valve PAIR", "", "", "2", "ROOF", "", "", "W1", "CW Valve"]]
+
+    result = convert(
+        [("Job - CHW.csv", make_csv(chw)),
+         ("Job - HW.csv", make_csv(hw)),
+         ("Job - CW.csv", make_csv(cw))],
+        "Job", lump_mode=False,
+    )
+
+    assert result.system_count == 3
+    assert result.row_count == 4
+    assert result.file_count == 5  # 1 CHW + 2 HW + 1 CW workbooks + summary
+
+    zf, names = zip_entries(result)
+    assert names == [
+        "CHW/Job - LEVEL 1 - CHW.xlsx",
+        "CW/Job - ROOF - CW.xlsx",
+        "HW/Job - LEVEL 1 - HW.xlsx",
+        "HW/Job - LEVEL 2 - HW.xlsx",
+        "Job - SUMMARY.xlsx",
+    ]
+
+    ws = rows_of(load_sheet(zf, "Job - SUMMARY.xlsx", "Summary"))
+    # One unified summary: CHW section, then HW, then CW, in upload order
+    assert ws[4][0] == "CHW"
+    assert ws[5][:5] == ["CHW", "LEVEL 1", 10.0, 10.0, "YES"]
+    assert ws[6][:5] == ["CHW TOTAL", None, 10.0, 10.0, "YES"]
+    assert ws[7][0] == "HW"
+    assert ws[8][:5] == ["HW", "LEVEL 1", 4.0, 4.0, "YES"]
+    assert ws[9][:5] == ["HW", "LEVEL 2", 6.0, 6.0, "YES"]
+    assert ws[10][:5] == ["HW TOTAL", None, 10.0, 10.0, "YES"]
+    assert ws[11][0] == "CW"
+    assert ws[12][:5] == ["CW", "ROOF", 4.0, 4.0, "YES"]  # PAIR doubles 2 -> 4
+    assert ws[13][:5] == ["CW TOTAL", None, 4.0, 4.0, "YES"]
+
+
+def test_batch_same_system_files_merge_quantities():
+    a = [["Pipe", "10", "m", "1", "LEVEL 1", "", "", "C1", "CHW Pipe"]]
+    b = [["Pipe", "5", "m", "1", "LEVEL 1", "", "", "C1", "CHW Pipe"]]
+
+    result = convert(
+        [("Riser CHW.csv", make_csv(a)), ("Plant CHW.csv", make_csv(b))],
+        "Job", lump_mode=False,
+    )
+
+    assert result.system_count == 1
+    zf, names = zip_entries(result)
+    # One workbook per level, no duplicate-name collisions
+    assert names == ["CHW/Job - LEVEL 1 - CHW.xlsx", "Job - SUMMARY.xlsx"]
+
+    ws = rows_of(load_sheet(zf, "CHW/Job - LEVEL 1 - CHW.xlsx", "Cavsoft_Import"))
+    assert ws[1] == ["C1", "CHW Pipe", "m", 15, "LEVEL 1"]
+
+
+def test_batch_error_names_offending_file():
+    good = [["Pipe", "1", "m", "1", "L1", "", "", "P1", "Pipe"]]
+    with pytest.raises(ParseError, match="empty HW.csv"):
+        convert([("chw.csv", make_csv(good)), ("empty HW.csv", make_csv([]))],
+                "T", lump_mode=False)
 
 
 def test_core_module_never_touches_disk():

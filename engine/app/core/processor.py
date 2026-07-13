@@ -48,11 +48,11 @@ class ParseError(Exception):
 
 
 # Deliberately carries only zero-retention-safe metadata besides the ZIP
-# payload itself: counts and the system tag, never row data or level names.
+# payload itself: counts only, never row data, level names, or system tags.
 @dataclass
 class ConversionResult:
     zip_bytes: bytes
-    system: str
+    system_count: int
     row_count: int
     file_count: int
     warning_count: int
@@ -306,24 +306,51 @@ def build_master_summary(tender_name, system_results) -> bytes:
     return buf.getvalue()
 
 
-def convert(csv_bytes: bytes, tender_name: str, lump_mode: bool,
-            source_filename: str = "") -> ConversionResult:
-    """Full pipeline: CSV bytes -> ZIP bytes of CAVsoft imports + summary."""
+def convert(files: list[tuple[str, bytes]], tender_name: str,
+            lump_mode: bool) -> ConversionResult:
+    """Batch pipeline: a list of (source filename, CSV bytes) exports ->
+    one ZIP of CAVsoft imports plus a single unified master summary.
+
+    Mirrors the prototype's export_paths loop: the system is detected per
+    file from its filename. Files that map to the same system are merged
+    before level grouping, so their quantities consolidate together.
+    """
     tender_name = sanitise(tender_name)
     if not tender_name:
         raise ParseError("Tender name is empty after sanitising.")
+    if not files:
+        raise ParseError("No files provided.")
 
-    system_name = detect_system(source_filename) or DEFAULT_SYSTEM
+    system_rows: OrderedDict[str, list] = OrderedDict()
+    row_count = 0
 
-    _header, rows = read_export(csv_bytes)
-    if not rows:
-        raise ParseError("CSV contains a header but no data rows.")
+    for source_filename, csv_bytes in files:
+        system_name = detect_system(source_filename) or DEFAULT_SYSTEM
+        try:
+            _header, rows = read_export(csv_bytes)
+        except ParseError as exc:
+            raise ParseError(f"'{source_filename}': {exc}") from exc
+        if not rows:
+            raise ParseError(
+                f"'{source_filename}' contains a header but no data rows."
+            )
+        system_rows.setdefault(system_name, []).extend(rows)
+        row_count += len(rows)
 
-    results, skipped = build_level_workbooks(
-        rows, system_name, tender_name, lump_sum_mode=lump_mode
-    )
+    system_results = []
+    workbook_count = 0
+    skipped_total = 0
 
-    if not results:
+    for system_name, rows in system_rows.items():
+        results, skipped = build_level_workbooks(
+            rows, system_name, tender_name, lump_sum_mode=lump_mode
+        )
+        skipped_total += skipped
+        if results:
+            system_results.append((system_name, results))
+            workbook_count += len(results)
+
+    if not system_results:
         raise ParseError(
             "No rows have both the Code and Description columns populated "
             f"(expected in columns {COL_CODE} and {COL_DESC})."
@@ -331,15 +358,16 @@ def convert(csv_bytes: bytes, tender_name: str, lump_mode: bool,
 
     zip_buf = io.BytesIO()
     with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        for r in results:
-            zf.writestr(f"{system_name}/{r['filename']}", r["xlsx_bytes"])
-        summary_bytes = build_master_summary(tender_name, [(system_name, results)])
+        for system_name, results in system_results:
+            for r in results:
+                zf.writestr(f"{system_name}/{r['filename']}", r["xlsx_bytes"])
+        summary_bytes = build_master_summary(tender_name, system_results)
         zf.writestr(f"{tender_name} - SUMMARY.xlsx", summary_bytes)
 
     return ConversionResult(
         zip_bytes=zip_buf.getvalue(),
-        system=system_name,
-        row_count=len(rows),
-        file_count=len(results) + 1,
-        warning_count=skipped,
+        system_count=len(system_results),
+        row_count=row_count,
+        file_count=workbook_count + 1,
+        warning_count=skipped_total,
     )

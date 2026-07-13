@@ -38,10 +38,13 @@ const conversionSchema = z.object({
     .trim()
     .min(1, "Enter a tender name.")
     .max(120, "Tender name must be 120 characters or fewer."),
-  file: z
-    .instanceof(File, { message: "Drop a Bluebeam CSV export first." })
-    .refine((f) => f.size > 0, "That file is empty.")
-    .refine((f) => f.size <= MAX_UPLOAD_BYTES, "CSV must be 25 MB or smaller."),
+  files: z
+    .array(z.instanceof(File).refine((f) => f.size > 0, "One of the files is empty."))
+    .min(1, "Drop at least one Bluebeam CSV export first.")
+    .refine(
+      (list) => list.reduce((sum, f) => sum + f.size, 0) <= MAX_UPLOAD_BYTES,
+      "Combined CSVs must be 25 MB or smaller."
+    ),
 });
 
 type Status =
@@ -72,33 +75,48 @@ async function errorMessage(res: Response): Promise<string> {
 export function ConversionPanel() {
   const [mode, setMode] = React.useState<Mode>("level-by-level");
   const [tenderName, setTenderName] = React.useState("");
-  const [file, setFile] = React.useState<File | null>(null);
+  const [files, setFiles] = React.useState<File[]>([]);
   const [dragActive, setDragActive] = React.useState(false);
   const [status, setStatus] = React.useState<Status>({ kind: "idle" });
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const busy = status.kind === "busy";
+  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
 
-  function acceptFile(candidate: File | undefined) {
-    if (candidate && candidate.name.toLowerCase().endsWith(".csv")) {
-      setFile(candidate);
-      setStatus({ kind: "idle" });
-    }
+  function acceptFiles(candidates: FileList | null | undefined) {
+    if (!candidates) return;
+    const incoming = Array.from(candidates).filter((f) =>
+      f.name.toLowerCase().endsWith(".csv")
+    );
+    if (incoming.length === 0) return;
+    setFiles((current) => {
+      const seen = new Set(current.map((f) => `${f.name}:${f.size}`));
+      return [
+        ...current,
+        ...incoming.filter((f) => !seen.has(`${f.name}:${f.size}`)),
+      ];
+    });
+    setStatus({ kind: "idle" });
+  }
+
+  function removeFile(target: File) {
+    setFiles((current) => current.filter((f) => f !== target));
+    if (inputRef.current) inputRef.current.value = "";
   }
 
   function resetDropzone() {
-    setFile(null);
+    setFiles([]);
     if (inputRef.current) inputRef.current.value = "";
   }
 
   function onDrop(event: React.DragEvent) {
     event.preventDefault();
     setDragActive(false);
-    if (!busy) acceptFile(event.dataTransfer.files[0]);
+    if (!busy) acceptFiles(event.dataTransfer.files);
   }
 
   async function handleConvert() {
-    const parsed = conversionSchema.safeParse({ tenderName, file });
+    const parsed = conversionSchema.safeParse({ tenderName, files });
     if (!parsed.success) {
       setStatus({
         kind: "error",
@@ -122,16 +140,20 @@ export function ConversionPanel() {
       const params = new URLSearchParams({
         tender_name: parsed.data.tenderName,
         lump_mode: String(mode === "lump-sum"),
-        filename: parsed.data.file.name,
       });
+
+      // One batch request: every system export in a single multipart body.
+      const formData = new FormData();
+      for (const f of parsed.data.files) {
+        formData.append("files", f, f.name);
+      }
 
       const res = await fetch(`${ENGINE_URL}/api/v1/convert?${params}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "text/csv",
         },
-        body: parsed.data.file,
+        body: formData,
       });
 
       if (!res.ok) {
@@ -204,11 +226,11 @@ export function ConversionPanel() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="bluebeam-csv">Bluebeam CSV export</Label>
+          <Label htmlFor="bluebeam-csv">Bluebeam CSV exports</Label>
           <div
             role="button"
             tabIndex={0}
-            aria-label="Upload Bluebeam CSV export"
+            aria-label="Upload Bluebeam CSV exports"
             onClick={() => !busy && inputRef.current?.click()}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
@@ -234,30 +256,44 @@ export function ConversionPanel() {
               id="bluebeam-csv"
               type="file"
               accept=".csv,text/csv"
+              multiple
               className="sr-only"
-              onChange={(event) => acceptFile(event.target.files?.[0])}
+              onChange={(event) => acceptFiles(event.target.files)}
             />
-            {file ? (
+            {files.length > 0 ? (
               <>
-                <FileSpreadsheet className="size-8 text-primary" />
-                <div>
-                  <p className="text-sm font-medium">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatSize(file.size)}
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={busy}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    resetDropzone();
-                  }}
-                >
-                  <X data-icon="inline-start" />
-                  Remove
-                </Button>
+                <ul className="flex w-full flex-col gap-1.5">
+                  {files.map((f) => (
+                    <li
+                      key={`${f.name}:${f.size}`}
+                      className="flex items-center gap-3 rounded-md bg-secondary/60 px-3 py-2 text-left"
+                    >
+                      <FileSpreadsheet className="size-4 shrink-0 text-primary" />
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {f.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatSize(f.size)}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Remove ${f.name}`}
+                        disabled={busy}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          removeFile(f);
+                        }}
+                      >
+                        <X />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  {files.length} file{files.length === 1 ? "" : "s"} ·{" "}
+                  {formatSize(totalSize)} — drop or click to add more systems
+                </p>
               </>
             ) : (
               <>
@@ -269,10 +305,10 @@ export function ConversionPanel() {
                 />
                 <div>
                   <p className="text-sm font-medium">
-                    Drag &amp; drop your CSV here
+                    Drag &amp; drop your system CSVs here
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    or click to browse — .csv up to 25 MB
+                    one per system (CHW, HW, CW…) — up to 25 MB combined
                   </p>
                 </div>
               </>
@@ -296,7 +332,7 @@ export function ConversionPanel() {
         <Button
           size="lg"
           className="w-full"
-          disabled={!file || busy}
+          disabled={files.length === 0 || busy}
           onClick={handleConvert}
         >
           {busy ? (
