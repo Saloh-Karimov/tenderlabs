@@ -185,8 +185,8 @@ export function ConversionPanel() {
   }
 
   return (
-    <Card className="w-full shadow-xs">
-      <CardHeader className="border-b">
+    <Card className="w-full rounded-2xl shadow-sm ring-foreground/5">
+      <CardHeader className="border-b border-border/60">
         <CardTitle>New conversion</CardTitle>
         <CardDescription>
           Drop a Bluebeam Revu CSV export and choose how CAVsoft should receive
@@ -245,7 +245,7 @@ export function ConversionPanel() {
             onDragLeave={() => setDragActive(false)}
             onDrop={onDrop}
             className={cn(
-              "bg-dot-grid flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-secondary/30 px-6 py-12 text-center inset-shadow-sm transition-colors outline-none",
+              "bg-dot-grid flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-secondary/30 px-6 py-12 text-center inset-shadow-sm transition-colors outline-none",
               "hover:border-primary/60 hover:bg-secondary/50 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               dragActive && "border-primary bg-primary/10",
               busy && "pointer-events-none opacity-60"
@@ -323,7 +323,7 @@ export function ConversionPanel() {
           </p>
         )}
         {status.kind === "done" && (
-          <p className="flex items-center gap-2 text-sm text-primary" role="status">
+          <p className="flex items-center gap-2 text-sm text-success" role="status">
             <CircleCheck className="size-4 shrink-0" />
             {status.message}
           </p>

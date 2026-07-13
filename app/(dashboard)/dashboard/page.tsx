@@ -65,7 +65,15 @@ const KPIS: {
   },
 ];
 
-// Dummy audit trail — metadata columns only, mirroring what the engine logs.
+// TODO: Replace this static dummy data with the real audit trail before
+// launch. The engine's BackgroundTask will insert metadata rows into
+// Supabase, and this server component fetches them in place of the constant:
+//   const { data: recent } = await supabase
+//     .from("audit_logs")
+//     .select("tender, mode, rows, created_at")
+//     .order("created_at", { ascending: false })
+//     .limit(7);
+// Metadata columns only — file contents never reach the database.
 const RECENT_CONVERSIONS = [
   { tender: "500 Bourke St — Tower A", mode: "Level-by-Level", rows: 12480 },
   { tender: "Westfield Doncaster L3", mode: "Lump Sum", rows: 3214 },
@@ -91,7 +99,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex min-h-svh flex-1 flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-8">
           <div className="flex items-center gap-3">
             <Logo />
@@ -121,7 +129,7 @@ export default async function DashboardPage() {
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-8 lg:px-8">
         <div className="flex flex-col gap-1">
-          <h1 className="font-heading text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Command Center
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -134,18 +142,21 @@ export default async function DashboardPage() {
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
         >
           {KPIS.map((kpi) => (
-            <Card key={kpi.label} className="gap-3 shadow-xs">
+            <Card
+              key={kpi.label}
+              className="gap-3 rounded-2xl shadow-sm ring-foreground/5"
+            >
               <CardHeader className="flex-row items-center justify-between">
                 <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   {kpi.label}
                 </span>
                 <kpi.icon
-                  className="size-4 shrink-0 text-muted-foreground"
+                  className="size-4 shrink-0 text-muted-foreground/70"
                   aria-hidden="true"
                 />
               </CardHeader>
               <CardContent className="flex flex-col gap-1">
-                <span className="text-3xl font-semibold tracking-tight tabular-nums">
+                <span className="text-4xl font-light tracking-tight text-foreground tabular-nums">
                   {kpi.value}
                 </span>
                 <span className="text-xs text-muted-foreground">
@@ -164,8 +175,8 @@ export default async function DashboardPage() {
             <ConversionPanel />
           </div>
 
-          <Card className="shadow-xs lg:col-span-3">
-            <CardHeader className="border-b">
+          <Card className="rounded-2xl shadow-sm ring-foreground/5 lg:col-span-3">
+            <CardHeader className="border-b border-border/60">
               <CardTitle>Recent conversions</CardTitle>
               <CardDescription>
                 Audit trail — metadata only. File contents never persist.
@@ -174,27 +185,40 @@ export default async function DashboardPage() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Tender</TableHead>
-                    <TableHead>Mode</TableHead>
-                    <TableHead className="text-right">Rows</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
+                  <TableRow className="border-border/60 hover:bg-transparent">
+                    <TableHead className="text-xs font-medium text-muted-foreground">
+                      Tender
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-muted-foreground">
+                      Mode
+                    </TableHead>
+                    <TableHead className="text-right text-xs font-medium text-muted-foreground">
+                      Rows
+                    </TableHead>
+                    <TableHead className="text-right text-xs font-medium text-muted-foreground">
+                      Status
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {RECENT_CONVERSIONS.map((row) => (
-                    <TableRow key={row.tender}>
-                      <TableCell className="max-w-56 truncate font-medium">
+                    <TableRow key={row.tender} className="border-border/40">
+                      <TableCell className="max-w-56 truncate py-3 font-medium">
                         {row.tender}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{row.mode}</Badge>
+                      <TableCell className="py-3">
+                        <Badge
+                          variant="outline"
+                          className="rounded-full border-border/70 px-2.5 font-medium text-muted-foreground"
+                        >
+                          {row.mode}
+                        </Badge>
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">
+                      <TableCell className="py-3 text-right tabular-nums">
                         {row.rows.toLocaleString("en-AU")}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Badge className="bg-success/10 text-success">
+                      <TableCell className="py-3 text-right">
+                        <Badge className="h-auto rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
                           <ShieldCheck aria-hidden="true" />
                           RAM Purged
                         </Badge>
