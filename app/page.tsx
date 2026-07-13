@@ -546,13 +546,14 @@ export default function Home() {
                     </ul>
                     <div className="mt-7 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4">
                       <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-400">
-                        <Sparkles className="size-3.5" />
-                        Includes $5,000 concierge onboarding
+                        <Sparkles className="size-3.5" />+ $5,000 one-time
+                        bespoke onboarding
                       </p>
                       <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
-                        We map your CavSoft item database, systems and templates
-                        by hand, with your estimators in the room. Your first
-                        live tender converts on day one — not week six.
+                        You send us your database. We manually map your CavSoft
+                        systems and architect a custom Bluebeam Revu toolset.
+                        You convert seamlessly on Day 1 without ever altering
+                        your takeoff process.
                       </p>
                     </div>
                     <Link
