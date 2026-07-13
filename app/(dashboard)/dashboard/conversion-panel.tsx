@@ -8,18 +8,12 @@ import {
   FileSpreadsheet,
   FileUp,
   LoaderCircle,
+  ShieldCheck,
   X,
 } from "lucide-react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -185,19 +179,29 @@ export function ConversionPanel() {
   }
 
   return (
-    <Card className="w-full gap-6 rounded-3xl border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-0 [--card-spacing:--spacing(8)]">
-      <CardHeader className="border-b border-slate-100">
-        <CardTitle className="text-lg font-semibold text-slate-900">
-          New conversion
-        </CardTitle>
-        <CardDescription className="text-slate-500">
-          Drop a Bluebeam Revu CSV export and choose how CavSoft should receive
-          it. Files are processed in memory only — nothing is stored.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+    <div className="w-full rounded-3xl border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="flex items-start justify-between gap-4 px-8 pt-7 pb-5">
+        <div>
+          <h2 className="text-[15px] font-semibold tracking-tight text-slate-900">
+            New conversion
+          </h2>
+          <p className="mt-1 text-[13px] leading-relaxed text-slate-400">
+            Drop your Bluebeam exports and choose how CavSoft should receive
+            them.
+          </p>
+        </div>
+        <span className="mt-0.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50/70 px-2.5 py-1 font-mono text-[10px] font-medium tracking-[0.14em] text-emerald-700 uppercase">
+          <ShieldCheck className="size-3" aria-hidden="true" />
+          In-RAM
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-7 border-t border-slate-100 px-8 py-7">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="tender-name" className="font-medium text-slate-700">
+          <Label
+            htmlFor="tender-name"
+            className="text-[13px] font-medium text-slate-600"
+          >
             Tender name
           </Label>
           <Input
@@ -207,31 +211,42 @@ export function ConversionPanel() {
             maxLength={120}
             disabled={busy}
             onChange={(event) => setTenderName(event.target.value)}
-            className="h-11 rounded-xl"
+            className="h-11 rounded-xl border-slate-200 bg-slate-50/50 text-[15px] transition-colors focus-visible:border-amber-500 focus-visible:bg-white focus-visible:ring-amber-500/15"
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label className="font-medium text-slate-700">Export mode</Label>
+          <Label className="text-[13px] font-medium text-slate-600">
+            Export mode
+          </Label>
           <ToggleGroup
-            variant="outline"
-            spacing={0}
+            spacing={1}
             value={[mode]}
             onValueChange={(value) => {
               if (value.length > 0 && !busy) setMode(value[0] as Mode);
             }}
+            className="w-full rounded-xl bg-slate-100/80 p-1"
           >
-            <ToggleGroupItem value="level-by-level" className="flex-1 px-4">
+            <ToggleGroupItem
+              value="level-by-level"
+              className="h-9 flex-1 rounded-lg px-4 text-[13px] font-medium text-slate-500 hover:bg-white/60 hover:text-slate-700 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-[0_1px_3px_rgb(0,0,0,0.08)]"
+            >
               Level-by-Level
             </ToggleGroupItem>
-            <ToggleGroupItem value="lump-sum" className="flex-1 px-4">
+            <ToggleGroupItem
+              value="lump-sum"
+              className="h-9 flex-1 rounded-lg px-4 text-[13px] font-medium text-slate-500 hover:bg-white/60 hover:text-slate-700 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-[0_1px_3px_rgb(0,0,0,0.08)]"
+            >
               Lump Sum
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="bluebeam-csv" className="font-medium text-slate-700">
+          <Label
+            htmlFor="bluebeam-csv"
+            className="text-[13px] font-medium text-slate-600"
+          >
             Bluebeam CSV exports
           </Label>
           <div
@@ -252,10 +267,11 @@ export function ConversionPanel() {
             onDragLeave={() => setDragActive(false)}
             onDrop={onDrop}
             className={cn(
-              "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center transition-all duration-200 ease-in-out outline-none",
-              "hover:scale-[1.01] hover:border-amber-500 hover:bg-amber-50/50",
-              "focus-visible:border-amber-500 focus-visible:ring-3 focus-visible:ring-amber-500/40",
-              dragActive && "scale-[1.01] border-amber-500 bg-amber-50/60",
+              "group/drop flex cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 px-6 py-10 text-center transition-all duration-300 ease-out outline-none",
+              "hover:border-amber-400 hover:bg-amber-50/40",
+              "focus-visible:border-amber-500 focus-visible:ring-4 focus-visible:ring-amber-500/15",
+              dragActive &&
+                "border-amber-500 bg-amber-50/60 shadow-[0_0_0_4px_rgb(245,158,11,0.08),0_12px_40px_rgb(245,158,11,0.12)]",
               busy && "pointer-events-none opacity-60"
             )}
           >
@@ -270,17 +286,19 @@ export function ConversionPanel() {
             />
             {files.length > 0 ? (
               <>
-                <ul className="flex w-full flex-col gap-1.5">
+                <ul className="flex w-full flex-col gap-2">
                   {files.map((f) => (
                     <li
                       key={`${f.name}:${f.size}`}
-                      className="flex items-center gap-3 rounded-xl border border-slate-200/60 bg-white px-3 py-2 text-left shadow-[0_2px_8px_rgb(0,0,0,0.03)]"
+                      className="flex items-center gap-3 rounded-xl border border-slate-200/60 bg-white px-3 py-2 text-left shadow-[0_2px_8px_rgb(0,0,0,0.03)] duration-300 animate-in fade-in slide-in-from-bottom-1"
                     >
-                      <FileSpreadsheet className="size-4 shrink-0 text-amber-500" />
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-amber-100 bg-amber-50">
+                        <FileSpreadsheet className="size-4 text-amber-600" />
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-slate-800">
                         {f.name}
                       </span>
-                      <span className="text-xs text-slate-400">
+                      <span className="font-mono text-[11px] text-slate-400">
                         {formatSize(f.size)}
                       </span>
                       <Button
@@ -288,6 +306,7 @@ export function ConversionPanel() {
                         size="icon-sm"
                         aria-label={`Remove ${f.name}`}
                         disabled={busy}
+                        className="text-slate-400 hover:text-slate-700"
                         onClick={(event) => {
                           event.stopPropagation();
                           removeFile(f);
@@ -298,27 +317,40 @@ export function ConversionPanel() {
                     </li>
                   ))}
                 </ul>
-                <p className="text-xs font-medium text-slate-500">
+                <p className="text-xs font-medium text-slate-400">
                   {files.length} file{files.length === 1 ? "" : "s"} ·{" "}
                   {formatSize(totalSize)} — drop or click to add more systems
                 </p>
               </>
             ) : (
               <>
-                <CloudUpload
+                <span
                   className={cn(
-                    "size-8 text-slate-400 transition-colors duration-200",
-                    dragActive && "text-amber-500"
+                    "flex size-14 items-center justify-center rounded-full border border-slate-200/60 bg-white shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-300",
+                    "group-hover/drop:-translate-y-1 group-hover/drop:shadow-[0_12px_32px_rgb(217,119,6,0.16)]",
+                    dragActive &&
+                      "-translate-y-1 shadow-[0_12px_32px_rgb(217,119,6,0.16)]"
                   )}
-                />
+                >
+                  <CloudUpload
+                    className={cn(
+                      "size-6 text-slate-400 transition-colors duration-300 group-hover/drop:text-amber-500",
+                      dragActive && "text-amber-600"
+                    )}
+                  />
+                </span>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    Drag &amp; drop your system CSVs here
+                    Drop your system CSVs
                   </p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-500">
-                    one per system (CHW, HW, CW…) — up to 25 MB combined
+                  <p className="mt-1 text-xs text-slate-400">
+                    or click to browse — CHW, HW, CW… up to 25 MB combined
                   </p>
                 </div>
+                <p className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+                  <ShieldCheck className="size-3 text-emerald-500" />
+                  Processed in RAM — never written to disk
+                </p>
               </>
             )}
           </div>
@@ -326,26 +358,26 @@ export function ConversionPanel() {
 
         {status.kind === "error" && (
           <p
-            className="flex items-center gap-2 text-sm font-medium text-red-600"
+            className="flex items-start gap-2 rounded-xl border border-red-100 bg-red-50/70 px-3.5 py-2.5 text-[13px] font-medium text-red-700 duration-300 animate-in fade-in"
             role="alert"
           >
-            <CircleAlert className="size-4 shrink-0" />
+            <CircleAlert className="mt-0.5 size-4 shrink-0" />
             {status.message}
           </p>
         )}
         {status.kind === "done" && (
           <p
-            className="flex items-center gap-2 text-sm font-medium text-emerald-600"
+            className="flex items-start gap-2 rounded-xl border border-emerald-100 bg-emerald-50/70 px-3.5 py-2.5 text-[13px] font-medium text-emerald-700 duration-300 animate-in fade-in"
             role="status"
           >
-            <CircleCheck className="size-4 shrink-0" />
+            <CircleCheck className="mt-0.5 size-4 shrink-0" />
             {status.message}
           </p>
         )}
 
         <Button
           size="lg"
-          className="h-12 w-full rounded-xl bg-slate-900 text-base font-semibold text-white transition-all hover:bg-slate-800"
+          className="h-12 w-full rounded-xl bg-slate-900 text-[15px] font-semibold text-white shadow-[0_8px_24px_rgb(15,23,42,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-[0_12px_32px_rgb(15,23,42,0.24)] active:translate-y-0 disabled:shadow-none"
           disabled={files.length === 0 || busy}
           onClick={handleConvert}
         >
@@ -356,7 +388,7 @@ export function ConversionPanel() {
           )}
           {busy ? "Converting…" : "Convert & Export for CavSoft"}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
