@@ -625,11 +625,11 @@ export default function Home() {
                   <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-400 sm:text-[15px]">
                     Required for all plans. Our engineering team maps your
                     entire CavSoft item database directly into a custom
-                    Bluebeam Revu toolset for your firm. After this intensive
-                    2-week deployment sprint, this bespoke architectural
-                    foundation allows our software to translate your takeoff
-                    data flawlessly. Your team gets 100% automation without
-                    altering how they actually measure on-screen.
+                    Bluebeam Revu toolset for your firm. After a dedicated
+                    implementation sprint, this precise 1-to-1 item mapping
+                    allows our conversion engine to translate your Bluebeam
+                    takeoffs perfectly. Your team gets 100% data automation
+                    without changing how they actually draw on-screen.
                   </p>
                 </div>
               </div>
