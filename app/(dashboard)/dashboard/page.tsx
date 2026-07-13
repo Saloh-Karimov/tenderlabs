@@ -8,16 +8,7 @@ import {
 } from "lucide-react";
 
 import { Logo } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -84,6 +75,9 @@ const RECENT_CONVERSIONS = [
   { tender: "Barangaroo C2 Ambient Loop", mode: "Lump Sum", rows: 4102 },
 ];
 
+const CARD_SHELL =
+  "bg-white rounded-3xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)]";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -98,23 +92,22 @@ export default async function DashboardPage() {
   const email = typeof claims.email === "string" ? claims.email : null;
 
   return (
-    <div className="flex min-h-svh flex-1 flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/85 backdrop-blur">
+    <div className="flex min-h-svh flex-1 flex-col bg-[#F8FAFC]">
+      <header className="sticky top-0 z-10 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-8">
           <div className="flex items-center gap-3">
             <Logo />
             <span
-              className="hidden h-4 w-px bg-border sm:block"
+              className="hidden h-4 w-px bg-slate-200 sm:block"
               aria-hidden="true"
             />
-            <span className="hidden text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase sm:block">
+            <span className="hidden text-xs font-medium tracking-[0.18em] text-slate-500 uppercase sm:block">
               Command Center
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
+          <div className="flex items-center gap-3">
             {email && (
-              <span className="hidden text-sm text-muted-foreground md:block">
+              <span className="hidden text-sm font-medium text-slate-500 md:block">
                 {email}
               </span>
             )}
@@ -127,43 +120,38 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-8 lg:px-8">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-6 pt-16 pb-16 lg:px-8">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
             Command Center
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-medium text-slate-500">
             Bluebeam → CAVsoft conversions, processed entirely in memory.
           </p>
         </div>
 
         <section
           aria-label="Throughput metrics"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
         >
           {KPIS.map((kpi) => (
-            <Card
-              key={kpi.label}
-              className="gap-3 rounded-2xl shadow-sm ring-foreground/5"
-            >
-              <CardHeader className="flex-row items-center justify-between">
-                <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <div key={kpi.label} className={`${CARD_SHELL} p-6`}>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-medium tracking-wide text-slate-500 uppercase">
                   {kpi.label}
                 </span>
                 <kpi.icon
-                  className="size-4 shrink-0 text-muted-foreground/70"
+                  className="size-4 shrink-0 text-slate-400"
                   aria-hidden="true"
                 />
-              </CardHeader>
-              <CardContent className="flex flex-col gap-1">
-                <span className="text-4xl font-light tracking-tight text-foreground tabular-nums">
+              </div>
+              <div className="mt-4 flex flex-col gap-1">
+                <span className="text-4xl font-semibold tracking-tighter text-slate-900 tabular-nums">
                   {kpi.value}
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {kpi.foot}
-                </span>
-              </CardContent>
-            </Card>
+                <span className="text-xs text-slate-400">{kpi.foot}</span>
+              </div>
+            </div>
           ))}
         </section>
 
@@ -175,60 +163,62 @@ export default async function DashboardPage() {
             <ConversionPanel />
           </div>
 
-          <Card className="rounded-2xl shadow-sm ring-foreground/5 lg:col-span-3">
-            <CardHeader className="border-b border-border/60">
-              <CardTitle>Recent conversions</CardTitle>
-              <CardDescription>
+          <div className={`${CARD_SHELL} overflow-hidden lg:col-span-3`}>
+            <div className="border-b border-slate-100 px-8 py-6">
+              <h2 className="text-base font-semibold text-slate-900">
+                Recent conversions
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
                 Audit trail — metadata only. File contents never persist.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
+            <div className="px-8 py-4">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border/60 hover:bg-transparent">
-                    <TableHead className="text-xs font-medium text-muted-foreground">
+                  <TableRow className="border-slate-100 hover:bg-transparent">
+                    <TableHead className="text-xs font-medium text-slate-500">
                       Tender
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-muted-foreground">
+                    <TableHead className="text-xs font-medium text-slate-500">
                       Mode
                     </TableHead>
-                    <TableHead className="text-right text-xs font-medium text-muted-foreground">
+                    <TableHead className="text-right text-xs font-medium text-slate-500">
                       Rows
                     </TableHead>
-                    <TableHead className="text-right text-xs font-medium text-muted-foreground">
+                    <TableHead className="text-right text-xs font-medium text-slate-500">
                       Status
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {RECENT_CONVERSIONS.map((row) => (
-                    <TableRow key={row.tender} className="border-border/40">
-                      <TableCell className="max-w-56 truncate py-3 font-medium">
+                    <TableRow
+                      key={row.tender}
+                      className="border-slate-100 hover:bg-slate-50/60"
+                    >
+                      <TableCell className="max-w-56 truncate py-3.5 font-medium text-slate-800">
                         {row.tender}
                       </TableCell>
-                      <TableCell className="py-3">
-                        <Badge
-                          variant="outline"
-                          className="rounded-full border-border/70 px-2.5 font-medium text-muted-foreground"
-                        >
+                      <TableCell className="py-3.5">
+                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
                           {row.mode}
-                        </Badge>
+                        </span>
                       </TableCell>
-                      <TableCell className="py-3 text-right tabular-nums">
+                      <TableCell className="py-3.5 text-right text-slate-600 tabular-nums">
                         {row.rows.toLocaleString("en-AU")}
                       </TableCell>
-                      <TableCell className="py-3 text-right">
-                        <Badge className="h-auto rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
-                          <ShieldCheck aria-hidden="true" />
+                      <TableCell className="py-3.5 text-right">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                          <ShieldCheck className="size-3" aria-hidden="true" />
                           RAM Purged
-                        </Badge>
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
       </main>
     </div>

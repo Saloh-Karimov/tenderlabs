@@ -185,17 +185,21 @@ export function ConversionPanel() {
   }
 
   return (
-    <Card className="w-full rounded-2xl shadow-sm ring-foreground/5">
-      <CardHeader className="border-b border-border/60">
-        <CardTitle>New conversion</CardTitle>
-        <CardDescription>
+    <Card className="w-full gap-6 rounded-3xl border border-slate-200/60 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-0 [--card-spacing:--spacing(8)]">
+      <CardHeader className="border-b border-slate-100">
+        <CardTitle className="text-lg font-semibold text-slate-900">
+          New conversion
+        </CardTitle>
+        <CardDescription className="text-slate-500">
           Drop a Bluebeam Revu CSV export and choose how CAVsoft should receive
           it. Files are processed in memory only — nothing is stored.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="tender-name">Tender name</Label>
+          <Label htmlFor="tender-name" className="font-medium text-slate-700">
+            Tender name
+          </Label>
           <Input
             id="tender-name"
             placeholder="e.g. 500 Bourke St — Tower A"
@@ -203,11 +207,12 @@ export function ConversionPanel() {
             maxLength={120}
             disabled={busy}
             onChange={(event) => setTenderName(event.target.value)}
+            className="h-11 rounded-xl"
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Export mode</Label>
+          <Label className="font-medium text-slate-700">Export mode</Label>
           <ToggleGroup
             variant="outline"
             spacing={0}
@@ -226,7 +231,9 @@ export function ConversionPanel() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="bluebeam-csv">Bluebeam CSV exports</Label>
+          <Label htmlFor="bluebeam-csv" className="font-medium text-slate-700">
+            Bluebeam CSV exports
+          </Label>
           <div
             role="button"
             tabIndex={0}
@@ -245,9 +252,10 @@ export function ConversionPanel() {
             onDragLeave={() => setDragActive(false)}
             onDrop={onDrop}
             className={cn(
-              "bg-dot-grid flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-secondary/30 px-6 py-12 text-center inset-shadow-sm transition-colors outline-none",
-              "hover:border-primary/60 hover:bg-secondary/50 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-              dragActive && "border-primary bg-primary/10",
+              "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center transition-all duration-200 ease-in-out outline-none",
+              "hover:scale-[1.01] hover:border-amber-500 hover:bg-amber-50/50",
+              "focus-visible:border-amber-500 focus-visible:ring-3 focus-visible:ring-amber-500/40",
+              dragActive && "scale-[1.01] border-amber-500 bg-amber-50/60",
               busy && "pointer-events-none opacity-60"
             )}
           >
@@ -266,13 +274,13 @@ export function ConversionPanel() {
                   {files.map((f) => (
                     <li
                       key={`${f.name}:${f.size}`}
-                      className="flex items-center gap-3 rounded-md bg-card px-3 py-2 text-left shadow-xs ring-1 ring-foreground/5"
+                      className="flex items-center gap-3 rounded-xl border border-slate-200/60 bg-white px-3 py-2 text-left shadow-[0_2px_8px_rgb(0,0,0,0.03)]"
                     >
-                      <FileSpreadsheet className="size-4 shrink-0 text-primary" />
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                      <FileSpreadsheet className="size-4 shrink-0 text-amber-500" />
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
                         {f.name}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-slate-400">
                         {formatSize(f.size)}
                       </span>
                       <Button
@@ -290,7 +298,7 @@ export function ConversionPanel() {
                     </li>
                   ))}
                 </ul>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs font-medium text-slate-500">
                   {files.length} file{files.length === 1 ? "" : "s"} ·{" "}
                   {formatSize(totalSize)} — drop or click to add more systems
                 </p>
@@ -299,15 +307,15 @@ export function ConversionPanel() {
               <>
                 <CloudUpload
                   className={cn(
-                    "size-8 text-muted-foreground",
-                    dragActive && "text-primary"
+                    "size-8 text-slate-400 transition-colors duration-200",
+                    dragActive && "text-amber-500"
                   )}
                 />
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-semibold text-slate-900">
                     Drag &amp; drop your system CSVs here
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-xs font-medium text-slate-500">
                     one per system (CHW, HW, CW…) — up to 25 MB combined
                   </p>
                 </div>
@@ -317,13 +325,19 @@ export function ConversionPanel() {
         </div>
 
         {status.kind === "error" && (
-          <p className="flex items-center gap-2 text-sm text-destructive" role="alert">
+          <p
+            className="flex items-center gap-2 text-sm font-medium text-red-600"
+            role="alert"
+          >
             <CircleAlert className="size-4 shrink-0" />
             {status.message}
           </p>
         )}
         {status.kind === "done" && (
-          <p className="flex items-center gap-2 text-sm text-success" role="status">
+          <p
+            className="flex items-center gap-2 text-sm font-medium text-emerald-600"
+            role="status"
+          >
             <CircleCheck className="size-4 shrink-0" />
             {status.message}
           </p>
@@ -331,7 +345,7 @@ export function ConversionPanel() {
 
         <Button
           size="lg"
-          className="w-full"
+          className="h-12 w-full rounded-xl bg-slate-900 text-base font-semibold text-white transition-all hover:bg-slate-800"
           disabled={files.length === 0 || busy}
           onClick={handleConvert}
         >
