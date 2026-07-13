@@ -6,6 +6,7 @@ import {
   Clock,
   Cpu,
   Database,
+  DraftingCompass,
   FileUp,
   Layers,
   Lock,
@@ -533,7 +534,7 @@ export default function Home() {
                     <p className="mt-2 text-xs font-medium text-amber-400">
                       {tier.roiLine}
                     </p>
-                    <ul className="mt-7 flex flex-col gap-3">
+                    <ul className="mt-7 flex flex-1 flex-col gap-3">
                       {tier.features.map((feature) => (
                         <li
                           key={feature}
@@ -544,18 +545,6 @@ export default function Home() {
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-7 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4">
-                      <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-400">
-                        <Sparkles className="size-3.5" />+ $5,000 one-time
-                        bespoke onboarding
-                      </p>
-                      <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
-                        You send us your database. We manually map your CavSoft
-                        systems and architect a custom Bluebeam Revu toolset.
-                        You convert seamlessly on Day 1 without ever altering
-                        your takeoff process.
-                      </p>
-                    </div>
                     <Link
                       href="/signup"
                       className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-amber-500 text-[15px] font-semibold text-slate-900 shadow-[0_8px_30px_rgb(245,158,11,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-amber-400"
@@ -607,6 +596,43 @@ export default function Home() {
                   </div>
                 )
               )}
+            </div>
+
+            {/* Deployment banner — the mandatory Phase 1 for every plan */}
+            <div className="relative mt-10 overflow-hidden rounded-3xl bg-slate-900 shadow-[0_24px_70px_rgb(15,23,42,0.35)] lg:mt-14">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-blueprint-grid opacity-[0.07]"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-24 -right-16 h-64 w-96 rounded-full bg-amber-500/15 blur-[100px]"
+              />
+              <div className="relative flex flex-col gap-6 p-8 sm:flex-row sm:items-start sm:gap-7 lg:p-10">
+                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10">
+                  <DraftingCompass className="size-7 text-amber-500" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] font-medium tracking-[0.25em] text-slate-400 uppercase">
+                    Required for all plans
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold tracking-tight text-balance text-white sm:text-2xl">
+                    Phase 1: Bespoke Blueprint Deployment{" "}
+                    <span className="whitespace-nowrap text-amber-400">
+                      (+ $5,000 one-time fee)
+                    </span>
+                  </h3>
+                  <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-400 sm:text-[15px]">
+                    Required for all plans. Our engineering team maps your
+                    entire CavSoft item database directly into a custom
+                    Bluebeam Revu toolset for your firm. After this intensive
+                    2-week deployment sprint, this bespoke architectural
+                    foundation allows our software to translate your takeoff
+                    data flawlessly. Your team gets 100% automation without
+                    altering how they actually measure on-screen.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
