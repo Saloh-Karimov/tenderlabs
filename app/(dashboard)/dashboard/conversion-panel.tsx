@@ -185,8 +185,8 @@ export function ConversionPanel() {
   }
 
   return (
-    <Card className="w-full max-w-xl">
-      <CardHeader>
+    <Card className="w-full shadow-xs">
+      <CardHeader className="border-b">
         <CardTitle>New conversion</CardTitle>
         <CardDescription>
           Drop a Bluebeam Revu CSV export and choose how CAVsoft should receive
@@ -245,7 +245,7 @@ export function ConversionPanel() {
             onDragLeave={() => setDragActive(false)}
             onDrop={onDrop}
             className={cn(
-              "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-secondary/30 px-6 py-10 text-center transition-colors outline-none",
+              "bg-dot-grid flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-secondary/30 px-6 py-12 text-center inset-shadow-sm transition-colors outline-none",
               "hover:border-primary/60 hover:bg-secondary/50 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               dragActive && "border-primary bg-primary/10",
               busy && "pointer-events-none opacity-60"
@@ -266,7 +266,7 @@ export function ConversionPanel() {
                   {files.map((f) => (
                     <li
                       key={`${f.name}:${f.size}`}
-                      className="flex items-center gap-3 rounded-md bg-secondary/60 px-3 py-2 text-left"
+                      className="flex items-center gap-3 rounded-md bg-card px-3 py-2 text-left shadow-xs ring-1 ring-foreground/5"
                     >
                       <FileSpreadsheet className="size-4 shrink-0 text-primary" />
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">
